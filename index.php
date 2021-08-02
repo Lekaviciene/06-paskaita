@@ -64,11 +64,14 @@ foreach($klientai as $eilute) {
 echo "<table>";
 
 
-//*var_dump($klientai)
+//var_dump($klientai)
 
 //setcookie("klientai", $klientas)
 
 //$klientai_tekstas implode("|")
+
+
+
   
  ?>
 </body>
