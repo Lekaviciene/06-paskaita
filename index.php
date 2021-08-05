@@ -20,6 +20,12 @@
         <button type="submit" name="patvirtinti">Patvirtinti</button>
 
     </form>
+
+    <form action="index.php" method="get">
+        <input type="text" value="1" name="t_id"/>
+        <button type="submit" name="trinti">Trinti</button>
+    </form>
+
 <?php
 // Susikurti asociatyvų masyvą "Klientai".
 // Kintamieji:
@@ -38,7 +44,39 @@
 // Papildomai: Sukurti galimybę pridėti klientą į masyvą bei ištrinti.
 
 
-if(isset($_GET["patvirtinti"])) {
+if(isset($_GET["trinti"])) {
+    $t_id = $_GET["t_id"];
+    
+    //patikrinti ar musu informacinis cookie egzistuoja
+    //is to cookies pasiimti masyva
+    //tikrinti ar musu t_id sutampa su kuriuo nors klientu
+    
+    //klientai[0]
+    //klientai[1]
+    //..
+    //klientai[9]
+    //t_id = 10
+    //$klientai[10] - kad tai neegzistuoja
+
+    if(isset($_COOKIE["klientai"])) {
+        $klientai = $_COOKIE["klientai"]; //teksta
+        $klientai = explode("|", $klientai);//masyva
+
+        if(isset($klientai[$t_id])) {
+            unset($klientai[$t_id]);
+        }
+
+        //implode, del to mes turim atnaujinti ir pati sausainiuka
+        $klientai_tekstas = implode("|", $klientai);
+        setcookie("klientai", $klientai_tekstas, time() + 3600, "/");
+
+        header("Location: index.php");
+    }
+    
+    echo "Trinamo elemento id: ". $t_id;
+}
+
+if (isset($_GET["patvirtinti"])) {
     $id = $_GET["id"];
     $vardas = $_GET["vardas"];
     $pavarde = $_GET["pavarde"];
@@ -51,8 +89,10 @@ if(isset($_GET["patvirtinti"])) {
 
 
     $klientai_tekstas = $_COOKIE["klientai"] . "|$id,$vardas,$pavarde,$asmens_kodas,$prisijungimo_data,$adresas,$elpastas";
-    echo $klientai_tekstas;
+    // echo $klientai_tekstas;
     setcookie("klientai", $klientai_tekstas, time() + 3600, "/");
+    //imituoti persikrovima
+    header("Location: index.php");
 }
 
 if(!isset($_COOKIE["klientai"])) {
@@ -95,10 +135,14 @@ echo "<table>";
 //$klientai - dvimatis masyvas
 //$eilute - vienmatis asociatyvus masyvas
 //$stulpelis - masyvo elementas/arba kazkoks kintamasis
+$indeksas = 0;
 foreach ($klientai as $eilute) {
 //Isvedineja lentyneles - eilute 200 eiluciu
     echo "<tr>";
     //isvesti stulpelius?
+        echo "<td>";
+            echo $indeksas;
+        echo "</td>";
     foreach($eilute as $stulpelis) { // 7 stulpeliai
         echo "<td>";
         echo $stulpelis;
@@ -106,6 +150,7 @@ foreach ($klientai as $eilute) {
     }
 
     echo "</tr>";
+    $indeksas++;
 }
 
 echo "</table>";
@@ -146,9 +191,11 @@ for($i = 0; $i < count($klientai) ; $i++) {
 $klientai_tekstas = implode("|",$klientai);
 
 // echo $klientai_tekstas;
-
-setcookie("klientai", $klientai_tekstas, time() + 3600, "/");
-
+//Reikalingas tik tam kad nustatytu musu pradines sugeneruotas reiksmes
+//Sits sausainiukas turi buti paleidziamas tik viena vieninteli karta
+if(!isset($_COOKIE["klientai"])) {
+    setcookie("klientai", $klientai_tekstas, time() + 3600, "/");
+}
 ?>
 
 
